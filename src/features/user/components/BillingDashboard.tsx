@@ -1,18 +1,35 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getBillingDetails } from '../api/billing';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getBillingDetails, deleteBillingDetails } from '../api/billing';
 import { PaymentMethodCard } from './PaymentMethodCard';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Loader2 } from 'lucide-react';
 
 interface BillingDashboardProps {
   onAddClick?: () => void;
 }
 
 export const BillingDashboard: React.FC<BillingDashboardProps> = ({ onAddClick }) => {
+  const queryClient = useQueryClient();
   const { data: billingMethods, isLoading, error } = useQuery({
     queryKey: ['billingDetails'],
     queryFn: getBillingDetails,
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteBillingDetails(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billingDetails'] });
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || 'Failed to delete payment method');
+    }
+  });
+
+  const handleRemove = (id: string) => {
+    if (window.confirm('Are you sure you want to remove this payment method?')) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -47,7 +64,15 @@ export const BillingDashboard: React.FC<BillingDashboardProps> = ({ onAddClick }
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Saved Methods</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Saved Methods</h3>
+          {deleteMutation.isPending && (
+            <div className="flex items-center gap-2 text-xs font-bold text-brand-secondary animate-pulse">
+              <Loader2 size={14} className="animate-spin" />
+              Updating...
+            </div>
+          )}
+        </div>
         <button 
           onClick={onAddClick}
           className="text-brand-secondary hover:text-brand-primary font-bold text-sm flex items-center gap-2 transition-colors"
@@ -62,7 +87,8 @@ export const BillingDashboard: React.FC<BillingDashboardProps> = ({ onAddClick }
           <PaymentMethodCard 
             key={method.id} 
             method={method} 
-            isDefault={index === 0} // Placeholder for default logic
+            isDefault={index === 0}
+            onRemove={handleRemove}
           />
         ))}
       </div>

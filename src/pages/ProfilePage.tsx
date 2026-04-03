@@ -168,15 +168,6 @@ const ProfilePage: React.FC = () => {
                     {isAddingPayment ? 'Add Payment Method' : 'Billing & Payments'}
                   </h2>
                 </div>
-                {!isAddingPayment && (
-                  <button 
-                    onClick={() => setIsAddingPayment(true)}
-                    className="flex items-center gap-2 bg-brand-primary text-brand-white px-4 py-2 rounded-xl font-bold hover:opacity-90 transition-all shadow-md shadow-brand-primary/10"
-                  >
-                    <Plus size={18} />
-                    <span>Add New</span>
-                  </button>
-                )}
                 {isAddingPayment && (
                   <button 
                     onClick={() => setIsAddingPayment(false)}
