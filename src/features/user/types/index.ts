@@ -43,19 +43,20 @@ export interface ChangePasswordDTO {
 }
 
 export interface BillingDetailsBase {
-  id?: string;
+  id: string;
   owner: string;
+  type: 'CARD' | 'BANK_ACCOUNT';
 }
 
 export interface CreditCard extends BillingDetailsBase {
-  type: 'creditCard';
+  type: 'CARD';
   cardNumber: string;
   expMonth: string;
   expYear: string;
 }
 
 export interface BankAccount extends BillingDetailsBase {
-  type: 'bankAccount';
+  type: 'BANK_ACCOUNT';
   account: string;
   bankname: string;
   swift: string;
