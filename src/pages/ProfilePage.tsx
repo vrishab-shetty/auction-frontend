@@ -7,8 +7,9 @@ import { PersonalDetails } from '@/features/user/components/PersonalDetails';
 import { BillingDashboard } from '@/features/user/components/BillingDashboard';
 import { PaymentMethodEditor } from '@/features/user/components/PaymentMethodEditor';
 import { AccountSettings } from '@/features/user/components/AccountSettings';
+import { ChangePasswordForm } from '@/features/user/components/ChangePasswordForm';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, CreditCard, Settings, LogOut, ArrowLeft } from 'lucide-react';
+import { User, CreditCard, Settings, LogOut, ArrowLeft, ShieldCheck } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { user, logout } = useAuthStore();
@@ -170,15 +171,28 @@ const ProfilePage: React.FC = () => {
           )}
 
           {activeTab === 'settings' && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="bg-red-50 p-2 rounded-lg text-red-600">
-                  <Settings size={24} />
+            <div className="space-y-12">
+              <section className="space-y-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-brand-secondary/20 p-2 rounded-lg text-brand-secondary">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <h2 className="text-3xl font-extrabold text-brand-primary">Security Settings</h2>
                 </div>
-                <h2 className="text-3xl font-extrabold text-red-600">Account Settings</h2>
-              </div>
-              <p className="text-brand-neutral mb-8">Review your account status and permanent actions.</p>
-              <AccountSettings />
+                <p className="text-brand-neutral mb-8">Update your password and manage security preferences.</p>
+                <ChangePasswordForm />
+              </section>
+
+              <section className="space-y-6 pt-6 border-t border-gray-100">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-red-50 p-2 rounded-lg text-red-600">
+                    <Settings size={24} />
+                  </div>
+                  <h2 className="text-3xl font-extrabold text-red-600">Account Deletion</h2>
+                </div>
+                <p className="text-brand-neutral mb-8">Review your account status and permanent actions.</p>
+                <AccountSettings />
+              </section>
             </div>
           )}
         </div>
