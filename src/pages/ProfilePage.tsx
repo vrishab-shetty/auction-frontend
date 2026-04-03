@@ -1,0 +1,190 @@
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getUser } from '@/features/user/api/user';
+import { useAuthStore } from '@/store/authStore';
+import { ProfileEditor } from '@/features/user/components/ProfileEditor';
+import { PersonalDetails } from '@/features/user/components/PersonalDetails';
+import { BillingDashboard } from '@/features/user/components/BillingDashboard';
+import { PaymentMethodEditor } from '@/features/user/components/PaymentMethodEditor';
+import { AccountSettings } from '@/features/user/components/AccountSettings';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, CreditCard, Settings, LogOut, ArrowLeft } from 'lucide-react';
+
+const ProfilePage: React.FC = () => {
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'settings'>('profile');
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  const { data: userData, isLoading, isError } = useQuery({
+    queryKey: ['user', user?.username],
+    queryFn: () => getUser(user!.username),
+    enabled: !!user?.username,
+  });
+
+  if (!user) {
+    return null; // App.tsx handles redirection
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-brand-white flex items-center justify-center">
+        <p className="text-xl text-brand-primary animate-pulse font-bold">Loading your profile...</p>
+      </div>
+    );
+  }
+
+  // Source of truth for display name: prefer freshly fetched userData, fallback to store user
+  const displayName = userData?.name || user.name;
+  const displayUsername = userData?.username || user.username;
+
+  return (
+    <div className="min-h-screen bg-brand-white">
+      {/* Header */}
+      <header className="bg-brand-primary text-brand-white p-4 shadow-md sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <Link to="/" className="text-2xl font-bold tracking-tight">Auction System</Link>
+          <div className="flex items-center gap-6">
+            <span className="hidden md:inline font-medium opacity-90 text-brand-white">
+              Welcome, {displayName}
+            </span>
+            <button 
+              onClick={() => { logout(); navigate('/'); }}
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-colors text-brand-white"
+            >
+              <LogOut size={18} />
+              <span className="font-semibold">Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Sidebar */}
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center">
+            <div className="w-24 h-24 bg-brand-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-secondary border-4 border-brand-white">
+              <User size={48} />
+            </div>
+            <h2 className="text-2xl font-bold text-brand-primary">{displayName}</h2>
+            <p className="text-brand-neutral font-medium">{displayUsername}</p>
+          </div>
+
+          <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <button 
+              onClick={() => { setActiveTab('profile'); setIsEditingProfile(false); }}
+              className={`w-full flex items-center gap-3 p-4 hover:bg-gray-50 font-semibold border-l-4 transition-all ${
+                activeTab === 'profile' 
+                  ? 'border-brand-secondary text-brand-primary bg-gray-50' 
+                  : 'border-transparent text-gray-500'
+              }`}
+            >
+              <User size={20} />
+              <span>Profile Information</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('billing')}
+              className={`w-full flex items-center gap-3 p-4 hover:bg-gray-50 font-semibold border-l-4 transition-all ${
+                activeTab === 'billing' 
+                  ? 'border-brand-secondary text-brand-primary bg-gray-50' 
+                  : 'border-transparent text-gray-500'
+              }`}
+            >
+              <CreditCard size={20} />
+              <span>Billing & Payments</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('settings')}
+              className={`w-full flex items-center gap-3 p-4 hover:bg-gray-50 font-semibold border-l-4 transition-all ${
+                activeTab === 'settings' 
+                  ? 'border-brand-secondary text-brand-primary bg-gray-50' 
+                  : 'border-transparent text-gray-500'
+              }`}
+            >
+              <Settings size={20} />
+              <span>Account Settings</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* Content Area */}
+        <div className="lg:col-span-2">
+          {activeTab === 'profile' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <div className="bg-brand-secondary/20 p-2 rounded-lg text-brand-secondary">
+                    <User size={24} />
+                  </div>
+                  <h2 className="text-3xl font-extrabold text-brand-primary">
+                    {isEditingProfile ? 'Edit Profile' : 'Profile Information'}
+                  </h2>
+                </div>
+                {isEditingProfile && (
+                  <button 
+                    onClick={() => setIsEditingProfile(false)}
+                    className="flex items-center gap-2 text-brand-neutral hover:text-brand-primary font-bold transition-colors"
+                  >
+                    <ArrowLeft size={18} />
+                    <span>Back to Details</span>
+                  </button>
+                )}
+              </div>
+              
+              <p className="text-brand-neutral mb-8">
+                {isEditingProfile 
+                  ? 'Update your personal information and contact details below.' 
+                  : 'Manage your personal details and how others see you on the platform.'}
+              </p>
+
+              {isError && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-6">
+                  <p className="text-red-700">Failed to load extended profile data. Some information may be missing.</p>
+                </div>
+              )}
+
+              {userData ? (
+                isEditingProfile ? (
+                  <ProfileEditor user={userData} onSuccess={() => setIsEditingProfile(false)} />
+                ) : (
+                  <PersonalDetails user={userData} onEdit={() => setIsEditingProfile(true)} />
+                )
+              ) : (
+                !isLoading && !isError && <p className="text-gray-500 italic">No detailed profile information available.</p>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'billing' && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="bg-brand-secondary/20 p-2 rounded-lg text-brand-secondary">
+                  <CreditCard size={24} />
+                </div>
+                <h2 className="text-3xl font-extrabold text-brand-primary">Billing & Payments</h2>
+              </div>
+              <p className="text-brand-neutral mb-8">Securely manage your payment methods and billing preferences.</p>
+              <BillingDashboard />
+              <PaymentMethodEditor />
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="bg-red-50 p-2 rounded-lg text-red-600">
+                  <Settings size={24} />
+                </div>
+                <h2 className="text-3xl font-extrabold text-red-600">Account Settings</h2>
+              </div>
+              <p className="text-brand-neutral mb-8">Review your account status and permanent actions.</p>
+              <AccountSettings />
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default ProfilePage;

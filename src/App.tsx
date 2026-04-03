@@ -1,21 +1,64 @@
-function App() {
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import { useAuthStore } from './store/authStore';
+
+function Home() {
+  const { user } = useAuthStore();
+  
   return (
-    <div className="min-h-screen bg-brand-white flex items-center justify-center p-4">
-      <div className="bg-brand-primary p-12 rounded-lg shadow-2xl text-center">
+    <div className="min-h-screen bg-brand-white flex flex-col items-center justify-center p-4">
+      <div className="bg-brand-primary p-12 rounded-lg shadow-2xl text-center max-w-2xl w-full">
         <h1 className="text-5xl font-extrabold text-brand-white mb-6">
           Auction Management System
         </h1>
+        <p className="text-brand-white/80 mb-8 text-lg">
+          Secure, real-time bidding for everyone.
+        </p>
         <div className="flex justify-center gap-4">
-          <button className="bg-brand-secondary text-brand-primary px-6 py-2 rounded font-bold hover:opacity-90 transition">
-            Start Bidding
-          </button>
-          <button className="bg-brand-neutral text-brand-white px-6 py-2 rounded font-bold hover:opacity-90 transition">
-            View Auctions
-          </button>
+          {user ? (
+            <Link 
+              to="/profile" 
+              className="bg-brand-secondary text-brand-primary px-8 py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg"
+            >
+              My Profile
+            </Link>
+          ) : (
+            <>
+              <Link 
+                to="/login" 
+                className="bg-brand-secondary text-brand-primary px-8 py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg"
+              >
+                Login
+              </Link>
+              <Link 
+                to="/register" 
+                className="bg-brand-neutral text-brand-white px-8 py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+function App() {
+  const { user } = useAuthStore();
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/profile" />} />
+        <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/profile" />} />
+        <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/login" />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
