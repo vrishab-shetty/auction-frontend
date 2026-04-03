@@ -7,14 +7,16 @@ import { PersonalDetails } from '@/features/user/components/PersonalDetails';
 import { BillingDashboard } from '@/features/user/components/BillingDashboard';
 import { PaymentMethodEditor } from '@/features/user/components/PaymentMethodEditor';
 import { AccountSettings } from '@/features/user/components/AccountSettings';
+import { ChangePasswordForm } from '@/features/user/components/ChangePasswordForm';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, CreditCard, Settings, LogOut, ArrowLeft } from 'lucide-react';
+import { User, CreditCard, Settings, LogOut, ArrowLeft, ShieldCheck, Plus } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'settings'>('profile');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isAddingPayment, setIsAddingPayment] = useState(false);
 
   const { data: userData, isLoading, isError } = useQuery({
     queryKey: ['user', user?.username],
@@ -83,7 +85,7 @@ const ProfilePage: React.FC = () => {
               <span>Profile Information</span>
             </button>
             <button 
-              onClick={() => setActiveTab('billing')}
+              onClick={() => { setActiveTab('billing'); setIsAddingPayment(false); }}
               className={`w-full flex items-center gap-3 p-4 hover:bg-gray-50 font-semibold border-l-4 transition-all ${
                 activeTab === 'billing' 
                   ? 'border-brand-secondary text-brand-primary bg-gray-50' 
@@ -156,29 +158,73 @@ const ProfilePage: React.FC = () => {
           )}
 
           {activeTab === 'billing' && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="bg-brand-secondary/20 p-2 rounded-lg text-brand-secondary">
-                  <CreditCard size={24} />
+            <div className="space-y-8">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <div className="bg-brand-secondary/20 p-2 rounded-lg text-brand-secondary">
+                    <CreditCard size={24} />
+                  </div>
+                  <h2 className="text-3xl font-extrabold text-brand-primary">
+                    {isAddingPayment ? 'Add Payment Method' : 'Billing & Payments'}
+                  </h2>
                 </div>
-                <h2 className="text-3xl font-extrabold text-brand-primary">Billing & Payments</h2>
+                {!isAddingPayment && (
+                  <button 
+                    onClick={() => setIsAddingPayment(true)}
+                    className="flex items-center gap-2 bg-brand-primary text-brand-white px-4 py-2 rounded-xl font-bold hover:opacity-90 transition-all shadow-md shadow-brand-primary/10"
+                  >
+                    <Plus size={18} />
+                    <span>Add New</span>
+                  </button>
+                )}
+                {isAddingPayment && (
+                  <button 
+                    onClick={() => setIsAddingPayment(false)}
+                    className="flex items-center gap-2 text-brand-neutral hover:text-brand-primary font-bold transition-colors"
+                  >
+                    <ArrowLeft size={18} />
+                    <span>Back to Methods</span>
+                  </button>
+                )}
               </div>
-              <p className="text-brand-neutral mb-8">Securely manage your payment methods and billing preferences.</p>
-              <BillingDashboard />
-              <PaymentMethodEditor />
+              
+              <p className="text-brand-neutral mb-8">
+                {isAddingPayment 
+                  ? 'Securely add a new credit card or bank account to your profile.' 
+                  : 'Manage your saved payment methods and choose your default for bidding.'}
+              </p>
+
+              {isAddingPayment ? (
+                <PaymentMethodEditor onClose={() => setIsAddingPayment(false)} />
+              ) : (
+                <BillingDashboard onAddClick={() => setIsAddingPayment(true)} />
+              )}
             </div>
           )}
 
           {activeTab === 'settings' && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="bg-red-50 p-2 rounded-lg text-red-600">
-                  <Settings size={24} />
+            <div className="space-y-12">
+              <section className="space-y-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-brand-secondary/20 p-2 rounded-lg text-brand-secondary">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <h2 className="text-3xl font-extrabold text-brand-primary">Security Settings</h2>
                 </div>
-                <h2 className="text-3xl font-extrabold text-red-600">Account Settings</h2>
-              </div>
-              <p className="text-brand-neutral mb-8">Review your account status and permanent actions.</p>
-              <AccountSettings />
+                <p className="text-brand-neutral mb-8">Update your password and manage security preferences.</p>
+                <ChangePasswordForm />
+              </section>
+
+              <section className="space-y-6 pt-6 border-t border-gray-100">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-red-50 p-2 rounded-lg text-red-600">
+                    <Settings size={24} />
+                  </div>
+                  <h2 className="text-3xl font-extrabold text-red-600">Account Deletion</h2>
+                </div>
+                <p className="text-brand-neutral mb-8">Review your account status and permanent actions.</p>
+                <AccountSettings />
+              </section>
             </div>
           )}
         </div>

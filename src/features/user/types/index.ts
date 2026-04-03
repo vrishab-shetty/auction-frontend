@@ -17,7 +17,7 @@ export interface UserDTO {
 
 export interface UserEditableDTO {
   name: string;
-  password?: string; // Optional on edit, required on register
+  password?: string; // Only for registration
   description: string;
   email: string;
   contact: string;
@@ -27,20 +27,36 @@ export interface UserEditableDTO {
   country: string;
 }
 
+export interface UserUpdateDTO {
+  name: string;
+  description: string;
+  contact: string;
+  zipCode: string;
+  street: string;
+  city: string;
+  country: string;
+}
+
+export interface ChangePasswordDTO {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface BillingDetailsBase {
-  id?: string;
+  id: string;
   owner: string;
+  type: 'CARD' | 'BANK_ACCOUNT';
 }
 
 export interface CreditCard extends BillingDetailsBase {
-  type: 'creditCard';
+  type: 'CARD';
   cardNumber: string;
   expMonth: string;
   expYear: string;
 }
 
 export interface BankAccount extends BillingDetailsBase {
-  type: 'bankAccount';
+  type: 'BANK_ACCOUNT';
   account: string;
   bankname: string;
   swift: string;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUser } from '../api/user';
-import { UserDTO, UserEditableDTO } from '../types';
+import { UserDTO, UserUpdateDTO } from '../types';
 import { extractFieldErrors } from '@/utils/errorUtils';
 import { useAuthStore } from '@/store/authStore';
 import { User, Mail, Phone, MapPin, FileText } from 'lucide-react';
@@ -16,10 +16,9 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onSuccess })
   const { user: currentUser, updateUser: updateGlobalUser } = useAuthStore();
   const formRef = useRef<HTMLFormElement>(null);
   
-  const [formData, setFormData] = useState<UserEditableDTO>({
+  const [formData, setFormData] = useState<UserUpdateDTO>({
     name: user.name,
     description: user.description || '',
-    email: user.username, 
     contact: user.contact,
     zipCode: user.homeAddress?.zipcode || '',
     street: user.homeAddress?.street || '',
@@ -31,7 +30,6 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onSuccess })
     setFormData({
       name: user.name,
       description: user.description || '',
-      email: user.username,
       contact: user.contact,
       zipCode: user.homeAddress?.zipcode || '',
       street: user.homeAddress?.street || '',
@@ -41,10 +39,11 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onSuccess })
   }, [user]);
 
   const mutation = useMutation({
-    mutationFn: (data: UserEditableDTO) => updateUser(data),
+    mutationFn: (data: UserUpdateDTO) => updateUser(data),
     onSuccess: (updatedUser) => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       
+      // Update global auth state to reflect changes (e.g., name) across the app
       if (currentUser) {
         updateGlobalUser({
           ...currentUser,
@@ -77,8 +76,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onSuccess })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const { email, ...rest } = formData;
-    mutation.mutate({ ...rest, email }); 
+    mutation.mutate(formData); 
   };
 
   const errors = extractFieldErrors(mutation.error);
@@ -123,7 +121,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onSuccess })
                 name="email" 
                 type="email" 
                 className="w-full border border-gray-100 bg-gray-50 pl-10 p-3 rounded-xl text-gray-500 cursor-not-allowed outline-none"
-                value={formData.email} 
+                value={user.username} 
                 readOnly 
               />
             </div>

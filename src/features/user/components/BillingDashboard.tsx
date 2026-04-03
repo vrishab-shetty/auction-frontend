@@ -1,91 +1,70 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getBillingDetails } from '../api/billing';
-import { CreditCard, BankAccount } from '../types';
-import { CreditCard as CardIcon, Landmark, User } from 'lucide-react';
+import { PaymentMethodCard } from './PaymentMethodCard';
+import { PlusCircle } from 'lucide-react';
 
-export const BillingDashboard: React.FC = () => {
-  const { data: billing, isLoading, error } = useQuery({
+interface BillingDashboardProps {
+  onAddClick?: () => void;
+}
+
+export const BillingDashboard: React.FC<BillingDashboardProps> = ({ onAddClick }) => {
+  const { data: billingMethods, isLoading, error } = useQuery({
     queryKey: ['billingDetails'],
     queryFn: getBillingDetails,
   });
 
-  if (isLoading) return <div className="p-4">Loading billing details...</div>;
-  
-  if (error || !billing) return (
-    <div className="bg-gray-50 p-6 rounded border border-dashed border-gray-300 text-center">
-      <p className="text-gray-500">No billing details found. Please add a payment method.</p>
-    </div>
-  );
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[1, 2].map(i => (
+          <div key={i} className="h-64 bg-gray-50 animate-pulse rounded-2xl border-2 border-gray-100" />
+        ))}
+      </div>
+    );
+  }
 
-  const isCreditCard = billing.type === 'creditCard';
+  if (error || !billingMethods || billingMethods.length === 0) {
+    return (
+      <div className="bg-white border-2 border-dashed border-gray-200 rounded-3xl p-12 text-center space-y-4">
+        <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-gray-400">
+          <PlusCircle size={32} />
+        </div>
+        <div className="space-y-1">
+          <h3 className="text-xl font-bold text-brand-primary">No Payment Methods</h3>
+          <p className="text-brand-neutral max-w-xs mx-auto">Add a bank account or credit card to start participating in auctions.</p>
+        </div>
+        <button 
+          onClick={onAddClick}
+          className="bg-brand-primary text-brand-white px-8 py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-brand-primary/20"
+        >
+          Add First Method
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white p-6 rounded shadow-sm border border-gray-100">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-brand-primary p-2 rounded-full text-brand-white">
-          {isCreditCard ? <CardIcon size={20} /> : <Landmark size={20} />}
-        </div>
-        <h3 className="text-xl font-bold text-brand-primary">
-          Current {isCreditCard ? 'Credit Card' : 'Bank Account'}
-        </h3>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Saved Methods</h3>
+        <button 
+          onClick={onAddClick}
+          className="text-brand-secondary hover:text-brand-primary font-bold text-sm flex items-center gap-2 transition-colors"
+        >
+          <PlusCircle size={18} />
+          Add New
+        </button>
       </div>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="flex items-start gap-3">
-          <User className="text-brand-neutral mt-1" size={18} />
-          <div>
-            <p className="text-sm text-gray-500 uppercase tracking-wider">Owner</p>
-            <p className="font-medium text-gray-900">{billing.owner}</p>
-          </div>
-        </div>
-
-        {isCreditCard ? (
-          <>
-            <div className="flex items-start gap-3">
-              <CardIcon className="text-brand-neutral mt-1" size={18} />
-              <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider">Card Number</p>
-                <p className="font-medium text-gray-900">
-                  **** **** **** {(billing as CreditCard).cardNumber.slice(-4)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-[18px]" /> {/* Spacer for alignment */}
-              <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider">Expiration</p>
-                <p className="font-medium text-gray-900">
-                  {(billing as CreditCard).expMonth}/{(billing as CreditCard).expYear}
-                </p>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex items-start gap-3">
-              <Landmark className="text-brand-neutral mt-1" size={18} />
-              <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider">Bank Name</p>
-                <p className="font-medium text-gray-900">{(billing as BankAccount).bankname}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-[18px]" />
-              <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider">Account Number</p>
-                <p className="font-medium text-gray-900">{(billing as BankAccount).account}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 col-span-full">
-              <div className="w-[18px]" />
-              <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wider">SWIFT/BIC</p>
-                <p className="font-medium text-gray-900">{(billing as BankAccount).swift}</p>
-              </div>
-            </div>
-          </>
-        )}
+        {billingMethods.map((method, index) => (
+          <PaymentMethodCard 
+            key={method.id} 
+            method={method} 
+            isDefault={index === 0} // Placeholder for default logic
+          />
+        ))}
       </div>
     </div>
   );
