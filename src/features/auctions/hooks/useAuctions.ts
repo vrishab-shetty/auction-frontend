@@ -6,7 +6,7 @@ export const useAuctions = (page = 0, size = 10) => {
   return useQuery({
     queryKey: ['auctions', page, size],
     queryFn: async () => {
-      const response = await apiClient.get<Result<PageResponse<any>>>(`/auctions?page=${page}&size=${size}`);
+      const response = await apiClient.get<Result<PageResponse<unknown>>>(`/auctions?page=${page}&size=${size}`);
       return response.data.data;
     },
   });

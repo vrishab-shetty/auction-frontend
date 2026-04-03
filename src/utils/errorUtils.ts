@@ -7,16 +7,16 @@ export const extractFieldErrors = (error: unknown): Record<string, string> => {
   if (!error) return fieldErrors;
   
   if (error instanceof AxiosError && error.response?.data) {
-    const result = error.response.data as Result<any>;
+    const result = error.response.data as Result<Record<string, unknown>>;
     if (!result.success && result.data && typeof result.data === 'object') {
       // The backend returns a map of fieldName -> errorMessage in result.data
       Object.keys(result.data).forEach(key => {
-        if (typeof result.data[key] === 'string') {
+        if (typeof result.data![key] === 'string') {
           // Normalize some common variations
           let normalizedKey = key;
           if (key === 'zipcode') normalizedKey = 'zipCode';
           
-          fieldErrors[normalizedKey] = result.data[key];
+          fieldErrors[normalizedKey] = result.data![key] as string;
         }
       });
     } else if (!result.success && result.message) {
