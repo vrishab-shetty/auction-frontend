@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import dashboardService from '../api/dashboardService';
 import { AuctionCard } from './AuctionCard';
 import { ChevronLeft, ChevronRight, History, Loader2 } from 'lucide-react';
 
 export const PastAuctionsSection: React.FC = () => {
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const size = 3;
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['pastAuctions', page],
     queryFn: () => dashboardService.getPastAuctions(page, size),
+    staleTime: 1000 * 60,
+    placeholderData: (previousData) => previousData,
   });
+
+  // Strategy 1: Reactive Background Prefetching
+  useEffect(() => {
+    if (data && page < data.totalPages - 1) {
+      const nextPage = page + 1;
+      queryClient.prefetchQuery({
+        queryKey: ['pastAuctions', nextPage],
+        queryFn: () => dashboardService.getPastAuctions(nextPage, size),
+      });
+    }
+  }, [data, page, queryClient]);
 
   if (isLoading && !data) {
     return (
@@ -28,7 +42,7 @@ export const PastAuctionsSection: React.FC = () => {
   }
 
   return (
-    <div className={`space-y-6 relative transition-opacity duration-300 ${isFetching ? 'opacity-40' : 'opacity-100'}`}>
+    <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <History className="text-brand-neutral" size={20} />
@@ -59,7 +73,7 @@ export const PastAuctionsSection: React.FC = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 grayscale opacity-80">
+      <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 grayscale transition-opacity duration-300 ${isFetching ? 'opacity-40' : 'opacity-100'}`}>
         {data.content.map((auction) => (
           <div key={auction.id} className="relative group">
             <AuctionCard auction={auction} />

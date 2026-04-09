@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import dashboardService from '../api/dashboardService';
 import { AuctionCard } from './AuctionCard';
 import { ChevronLeft, ChevronRight, Inbox, Loader2 } from 'lucide-react';
 
 export const ActiveAuctionsList: React.FC = () => {
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const size = 3;
 
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['activeAuctions', page],
     queryFn: () => dashboardService.getActiveAuctions(page, size),
+    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    placeholderData: (previousData) => previousData,
   });
+
+  // Strategy 1: Reactive Background Prefetching
+  useEffect(() => {
+    if (data && page < data.totalPages - 1) {
+      const nextPage = page + 1;
+      queryClient.prefetchQuery({
+        queryKey: ['activeAuctions', nextPage],
+        queryFn: () => dashboardService.getActiveAuctions(nextPage, size),
+      });
+    }
+  }, [data, page, queryClient]);
 
   if (isLoading && !data) {
     return (
