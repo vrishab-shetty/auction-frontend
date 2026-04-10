@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { AuctionDTO } from '@/features/auctions/types';
 import { Clock, Tag, User, Calendar } from 'lucide-react';
 
+import { formatRelativeTime } from '@/utils/dateUtils';
+
 interface AuctionCardProps {
   auction: AuctionDTO;
 }
@@ -14,14 +16,13 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
 
   useEffect(() => {
     const updateTimer = () => {
-      const now = new Date().getTime();
-      const start = new Date(auction.startTime).getTime();
-      const end = new Date(auction.endTime).getTime();
+      const now = new Date();
+      const start = new Date(auction.startTime);
+      const end = new Date(auction.endTime);
 
       if (now < start) {
         setStatus('Scheduled');
-        const diff = start - now;
-        setTimeLeft(formatTime(diff));
+        setTimeLeft(formatRelativeTime(start));
         return;
       }
 
@@ -32,15 +33,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
       }
 
       setStatus('Active');
-      const diff = end - now;
-      setTimeLeft(formatTime(diff));
-    };
-
-    const formatTime = (ms: number) => {
-      const hours = Math.floor(ms / (1000 * 60 * 60));
-      const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-      return `${hours}h ${minutes}m ${seconds}s`;
+      setTimeLeft(formatRelativeTime(end));
     };
 
     updateTimer();
