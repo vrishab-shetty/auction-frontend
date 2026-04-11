@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import dashboardService from '../api/dashboardService';
-import { ItemCard } from './ItemCard';
+import { ItemCard } from '@/components/ItemCard';
 import { ChevronLeft, ChevronRight, TrendingUp, Loader2 } from 'lucide-react';
 
 export const PopularItemsGallery: React.FC = () => {

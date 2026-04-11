@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import DashboardPage from './pages/DashboardPage';
+import SearchPage from './pages/SearchPage';
 import { useAuthStore } from './store/authStore';
 
 function Home() {
@@ -51,6 +52,7 @@ function App() {
         <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/dashboard" />} />
         <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/login" />} />
         <Route path="/dashboard" element={user ? <DashboardPage /> : <Navigate to="/login" />} />
+        <Route path="/search" element={user ? <SearchPage /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );
