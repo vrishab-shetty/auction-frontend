@@ -1,9 +1,9 @@
 import React from 'react';
-import { AuctionItemDTO } from '@/features/auctions/types';
+import { ItemDTO } from '@/api/types';
 import { MapPin, TrendingUp, DollarSign } from 'lucide-react';
 
 interface ItemCardProps {
-  item: AuctionItemDTO;
+  item: ItemDTO;
 }
 
 export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {

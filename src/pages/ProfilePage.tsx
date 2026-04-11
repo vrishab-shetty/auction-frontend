@@ -8,11 +8,12 @@ import { BillingDashboard } from '@/features/user/components/BillingDashboard';
 import { PaymentMethodEditor } from '@/features/user/components/PaymentMethodEditor';
 import { AccountSettings } from '@/features/user/components/AccountSettings';
 import { ChangePasswordForm } from '@/features/user/components/ChangePasswordForm';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, CreditCard, Settings, LogOut, ArrowLeft, ShieldCheck, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { User, CreditCard, Settings, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { Navbar } from '@/components/Navbar';
 
 const ProfilePage: React.FC = () => {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'settings'>('profile');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -41,27 +42,10 @@ const ProfilePage: React.FC = () => {
   const displayUsername = userData?.username || user.username;
 
   return (
-    <div className="min-h-screen bg-brand-white">
-      {/* Header */}
-      <header className="bg-brand-primary text-brand-white p-4 shadow-md sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold tracking-tight">Auction System</Link>
-          <div className="flex items-center gap-6">
-            <span className="hidden md:inline font-medium opacity-90 text-brand-white">
-              Welcome, {displayName}
-            </span>
-            <button 
-              onClick={() => { logout(); navigate('/'); }}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-colors text-brand-white"
-            >
-              <LogOut size={18} />
-              <span className="font-semibold">Logout</span>
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#f8fafc]">
+      <Navbar />
 
-      <main className="max-w-6xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="max-w-7xl mx-auto p-4 md:p-8 pt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Sidebar */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center">

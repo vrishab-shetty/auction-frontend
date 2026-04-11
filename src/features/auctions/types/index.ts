@@ -1,22 +1,11 @@
-export interface AuctionItemDTO {
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  initialPrice: number;
-  currentBid?: number;
-  imageUrls?: string[];
-  legitimacyProof?: string;
-  extras?: string;
-  buyer?: string;
-}
+import { ItemDTO } from "@/api/types";
 
 export interface AuctionDTO {
   id: string;
   name: string;
   startTime: string;
   endTime: string;
-  items: AuctionItemDTO[];
+  items: ItemDTO[];
   user: string;
 }
 

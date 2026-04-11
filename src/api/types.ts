@@ -12,3 +12,18 @@ export interface PageResponse<T> {
   isFirst: boolean;
   isLast: boolean;
 }
+
+export interface ItemDTO {
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  initialPrice: number;
+  currentBid?: number;
+  imageUrls?: string[];
+  legitimacyProof?: string;
+  extras?: string;
+  buyer?: string;
+  seller?: string;
+  popularity?: number;
+}
