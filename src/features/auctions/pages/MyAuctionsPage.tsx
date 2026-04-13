@@ -62,7 +62,7 @@ const MyAuctionsPage: React.FC = () => {
             </div>
           </div>
           <Link 
-            to="/dashboard"
+            to="/my-auctions/create"
             className="flex items-center gap-2 bg-brand-primary text-brand-white px-6 py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-brand-primary/20"
           >
             <Plus size={20} />

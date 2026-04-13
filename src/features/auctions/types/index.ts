@@ -27,6 +27,23 @@ export interface AuctionUpdateDTO {
   items: AuctionItemUpdateDTO[];
 }
 
+export interface ItemCreationDTO {
+  name: string;
+  description: string;
+  location: string;
+  initialPrice: number;
+  imageUrls?: string[];
+  legitimacyProof?: string;
+  extras?: string;
+}
+
+export interface AuctionCreationDTO {
+  name: string;
+  startTime: string;
+  endTime: string;
+  items: ItemCreationDTO[];
+}
+
 export interface AuctionUpdateEvent {
   auctionId: string;
   itemId: string;
