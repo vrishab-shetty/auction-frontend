@@ -1,6 +1,7 @@
 import apiClient from '@/api/client';
 import { Result } from '@/api/types';
 import { UserDTO, UserUpdateDTO, ChangePasswordDTO } from '../types';
+import { AuctionDTO } from '@/features/auctions/types';
 
 export const getUser = async (username: string): Promise<UserDTO> => {
   const response = await apiClient.get<Result<UserDTO>>(`/users/${username}`);
@@ -18,4 +19,9 @@ export const changePassword = async (passwordData: ChangePasswordDTO): Promise<v
 
 export const deleteUser = async (): Promise<void> => {
   await apiClient.delete('/user/self');
+};
+
+export const getMyAuctions = async (): Promise<AuctionDTO[]> => {
+  const response = await apiClient.get<Result<AuctionDTO[]>>('/user/self/auctions');
+  return response.data.data!;
 };

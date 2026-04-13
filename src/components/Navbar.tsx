@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { LogOut, User as UserIcon, LayoutDashboard, Search as SearchIcon, Settings } from 'lucide-react';
+import { LogOut, User as UserIcon, LayoutDashboard, Search as SearchIcon, Settings, Gavel } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuthStore();
@@ -27,6 +27,13 @@ export const Navbar: React.FC = () => {
             >
               <LayoutDashboard size={16} />
               Dashboard
+            </Link>
+            <Link 
+              to="/my-auctions" 
+              className={`text-sm font-bold flex items-center gap-2 transition-all pb-1 border-b-2 ${isActive('/my-auctions') ? 'text-brand-secondary border-brand-secondary' : 'text-white/70 hover:text-white border-transparent'}`}
+            >
+              <Gavel size={16} />
+              My Auction
             </Link>
             <Link 
               to="/search" 
