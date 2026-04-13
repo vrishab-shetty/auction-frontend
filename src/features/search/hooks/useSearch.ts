@@ -1,17 +1,15 @@
-import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import searchService from '../api/searchService';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ItemDTO } from '@/api/types';
 
 export const useSearch = (pageSize = 12) => {
-  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
 
-  const query = searchParams.get('q') || '';
-  const location = searchParams.get('loc') || '';
-  const page = parseInt(searchParams.get('page') || '0', 10);
+  const [query, setQuery] = useState('');
+  const [location, setLocation] = useState('');
+  const [page, setPage] = useState(0);
 
   const debouncedQuery = useDebounce(query, 300);
   const debouncedLocation = useDebounce(location, 300);
@@ -35,25 +33,19 @@ export const useSearch = (pageSize = 12) => {
   }, [data, page, debouncedQuery, debouncedLocation, queryClient, pageSize]);
 
   const updateSearch = (newParams: { q?: string; loc?: string; page?: number }) => {
-    const nextParams = new URLSearchParams(searchParams);
-    
     if (newParams.q !== undefined) {
-      if (newParams.q) nextParams.set('q', newParams.q);
-      else nextParams.delete('q');
-      nextParams.set('page', '0'); // Reset to first page on new query
+      setQuery(newParams.q);
+      setPage(0); // Reset to first page on new query
     }
     
     if (newParams.loc !== undefined) {
-      if (newParams.loc) nextParams.set('loc', newParams.loc);
-      else nextParams.delete('loc');
-      nextParams.set('page', '0'); // Reset to first page on new location
+      setLocation(newParams.loc);
+      setPage(0); // Reset to first page on new location
     }
 
     if (newParams.page !== undefined) {
-      nextParams.set('page', newParams.page.toString());
+      setPage(newParams.page);
     }
-
-    setSearchParams(nextParams);
   };
 
   return {
