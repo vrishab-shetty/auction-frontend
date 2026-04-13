@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    /* Prevent layout shift when scrollbar appears/disappears */
+    scrollbar-gutter: stable;
+  }
+
+  /* Custom "Overlay" Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent /* Opaque background matching the app */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* medium gray */
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* darker gray on hover */
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+}
