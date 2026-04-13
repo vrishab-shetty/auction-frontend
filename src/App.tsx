@@ -4,6 +4,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import DashboardPage from './pages/DashboardPage';
 import SearchPage from './pages/SearchPage';
+import AuctionDetailsPage from './features/auctions/pages/AuctionDetailsPage';
 import { useAuthStore } from './store/authStore';
 
 function Home() {
@@ -53,6 +54,7 @@ function App() {
         <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/login" />} />
         <Route path="/dashboard" element={user ? <DashboardPage /> : <Navigate to="/login" />} />
         <Route path="/search" element={user ? <SearchPage /> : <Navigate to="/login" />} />
+        <Route path="/auctions/:auctionId" element={user ? <AuctionDetailsPage /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );
