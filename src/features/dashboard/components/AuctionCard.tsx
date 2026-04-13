@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { AuctionDTO } from '@/features/auctions/types';
 import { Clock, Tag, User, Calendar } from 'lucide-react';
-
 import { formatRelativeTime } from '@/utils/dateUtils';
 
 interface AuctionCardProps {
@@ -47,6 +47,10 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
       case 'Finished': return 'bg-gray-100 text-gray-500';
       default: return 'bg-green-100 text-green-600';
     }
+  };
+
+  const handleViewAuction = () => {
+    sessionStorage.setItem('dashboard-scroll', window.scrollY.toString());
   };
 
   return (
@@ -97,9 +101,13 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
           </div>
         </div>
 
-        <button className="w-full bg-brand-primary text-brand-white py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-brand-primary/20 mt-4">
+        <Link 
+          to={`/auctions/${auction.id}`}
+          onClick={handleViewAuction}
+          className="w-full bg-brand-primary text-brand-white py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-brand-primary/20 mt-4 block text-center"
+        >
           View Auction
-        </button>
+        </Link>
       </div>
     </div>
   );

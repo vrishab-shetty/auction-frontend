@@ -16,6 +16,21 @@ export const ActiveAuctionsList: React.FC = () => {
     placeholderData: (previousData) => previousData,
   });
 
+  // Restore scroll position after content load (following the user provided example)
+  useEffect(() => {
+    if (data && !isLoading && !isFetching) {
+      const savedScrollPos = sessionStorage.getItem('dashboard-scroll');
+      if (savedScrollPos) {
+        // Use a small timeout to ensure the DOM has fully adjusted to the new data
+        const timeoutId = setTimeout(() => {
+          window.scrollTo(0, parseInt(savedScrollPos, 10));
+          sessionStorage.removeItem('dashboard-scroll');
+        }, 100);
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [data, isLoading, isFetching]);
+
   // Strategy 1: Reactive Background Prefetching
   useEffect(() => {
     if (data && page < data.totalPages - 1) {

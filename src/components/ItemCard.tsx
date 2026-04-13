@@ -21,9 +21,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
             <TrendingUp size={48} />
           </div>
         )}
-        <div className="absolute top-4 left-4 bg-brand-secondary text-brand-primary text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider shadow-sm">
-          Popular
-        </div>
       </div>
 
       <div className="p-5 space-y-4">
