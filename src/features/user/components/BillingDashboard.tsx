@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { getBillingDetails, deleteBillingDetails } from '../api/billing';
 import { PaymentMethodCard } from './PaymentMethodCard';
 import { PlusCircle, Loader2 } from 'lucide-react';
@@ -20,7 +21,7 @@ export const BillingDashboard: React.FC<BillingDashboardProps> = ({ onAddClick }
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['billingDetails'] });
     },
-    onError: (err: any) => {
+    onError: (err: AxiosError<{message: string}>) => {
       alert(err.response?.data?.message || 'Failed to delete payment method');
     }
   });

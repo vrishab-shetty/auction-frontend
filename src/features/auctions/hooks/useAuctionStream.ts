@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AuctionUpdateEvent, NotificationEvent } from '@/features/auctions/types';
 
-export const useAuctionEvents = (auctionId?: string) => {
+export const useAuctionStream = (auctionId?: string) => {
   const [lastEvent, setLastEvent] = useState<AuctionUpdateEvent | null>(null);
 
   useEffect(() => {

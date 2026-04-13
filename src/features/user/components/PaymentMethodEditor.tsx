@@ -50,7 +50,7 @@ export const PaymentMethodEditor: React.FC<PaymentMethodEditorProps> = ({ onClos
       ? { type, owner, cardNumber, expMonth, expYear }
       : { type, owner, account, bankname, swift };
     
-    mutation.mutate(payload as any);
+    mutation.mutate(payload as Omit<BillingDetails, 'id'>);
   };
 
   const errors = extractFieldErrors(mutation.error);

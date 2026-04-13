@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import searchService from '../api/searchService';
 import { useDebounce } from '@/hooks/useDebounce';
-import { ItemDTO } from '@/api/types';
 
 export const useSearch = (pageSize = 12) => {
   const [searchParams, setSearchParams] = useSearchParams();

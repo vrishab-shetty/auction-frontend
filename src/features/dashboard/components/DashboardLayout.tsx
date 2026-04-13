@@ -2,7 +2,7 @@ import React from 'react';
 import { ActiveAuctionsList } from './ActiveAuctionsList';
 import { PopularItemsGallery } from './PopularItemsGallery';
 import { PastAuctionsSection } from './PastAuctionsSection';
-import { Activity, LayoutDashboard } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
   return (

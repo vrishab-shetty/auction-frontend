@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMyAuctions } from '../hooks/useMyAuctions';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import auctionService from '../api/auctionService';
 import { AuctionStatusBadge } from '../components/AuctionStatusBadge';
 import { AuctionEditForm } from '../components/AuctionEditForm';
@@ -20,7 +21,7 @@ const MyAuctionsPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['my-auctions'] });
       alert('Auction deleted successfully');
     },
-    onError: (err: any) => {
+    onError: (err: AxiosError<{message: string}>) => {
       alert(err.response?.data?.message || 'Failed to delete auction');
     }
   });
