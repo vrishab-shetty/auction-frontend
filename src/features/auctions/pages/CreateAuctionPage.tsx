@@ -3,11 +3,12 @@ import { useCreateAuction } from '../hooks/useCreateAuction';
 import { AuctionCreationDTO, ItemCreationDTO } from '../types';
 import { extractFieldErrors } from '@/utils/errorUtils';
 import { Navbar } from '@/components/Navbar';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Plus, Trash2, Package, Gavel, Info } from 'lucide-react';
 
 const CreateAuctionPage: React.FC = () => {
   const createMutation = useCreateAuction();
+  const navigate = useNavigate();
   
   // Set default start time to tomorrow at the same time
   const tomorrow = new Date();
@@ -95,9 +96,13 @@ const CreateAuctionPage: React.FC = () => {
 
       <main className="max-w-4xl mx-auto p-4 md:p-8 pt-10 space-y-8">
         <div className="flex items-center gap-4">
-          <Link to="/my-auctions" className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-brand-neutral">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-brand-neutral"
+            title="Go back"
+          >
             <ArrowLeft size={24} />
-          </Link>
+          </button>
           <div>
             <h1 className="text-3xl font-black text-brand-primary tracking-tight">Schedule New Auction</h1>
             <p className="text-brand-neutral font-medium">Configure your event and list your exclusive items.</p>
@@ -282,12 +287,13 @@ const CreateAuctionPage: React.FC = () => {
             >
               {createMutation.isPending ? 'Scheduling Auction...' : 'Initialize Auction Event'}
             </button>
-            <Link
-              to="/my-auctions"
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
               className="px-10 py-5 rounded-3xl font-bold text-brand-neutral hover:bg-gray-100 transition-colors border-2 border-transparent"
             >
               Cancel
-            </Link>
+            </button>
           </div>
         </form>
       </main>

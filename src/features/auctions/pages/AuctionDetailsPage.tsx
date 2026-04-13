@@ -53,16 +53,6 @@ const AuctionDetailsPage: React.FC = () => {
       <Navbar />
 
       <main className="max-w-7xl mx-auto p-4 md:p-8 pt-10 space-y-8">
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-sm font-bold text-gray-400 overflow-hidden whitespace-nowrap">
-          <Link to="/dashboard" className="flex items-center gap-1 hover:text-brand-primary transition-colors">
-            <Home size={16} />
-            <span>Dashboard</span>
-          </Link>
-          <ChevronRight size={14} />
-          <span className="text-brand-primary truncate">{auction.name}</span>
-        </nav>
-
         {/* Auction Header */}
         <div className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-2 h-full bg-brand-secondary" />
