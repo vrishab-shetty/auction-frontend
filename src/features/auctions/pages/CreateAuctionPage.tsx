@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useCreateAuction } from '../hooks/useCreateAuction';
 import { AuctionCreationDTO, ItemCreationDTO } from '../types';
 import { extractFieldErrors } from '@/utils/errorUtils';
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from '@/features/core/components/Navbar';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Plus, Trash2, Package, Gavel, Info } from 'lucide-react';
 

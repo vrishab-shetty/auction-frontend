@@ -4,7 +4,7 @@ import { useAuctionDetails } from '../hooks/useAuctionDetails';
 import { useAuctionStream } from '../hooks/useAuctionStream';
 import { AuctionStatusBadge } from '../components/AuctionStatusBadge';
 import { ItemCard } from '@/components/ItemCard';
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from '@/features/core/components/Navbar';
 import { Calendar, Clock, User, Package, Signal, SignalLow } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateUtils';
 

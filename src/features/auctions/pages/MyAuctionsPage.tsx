@@ -5,7 +5,7 @@ import auctionService from '../api/auctionService';
 import { AuctionStatusBadge } from '../components/AuctionStatusBadge';
 import { AuctionEditForm } from '../components/AuctionEditForm';
 import { AuctionDTO } from '../types';
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from '@/features/core/components/Navbar';
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2, Package, AlertCircle, Plus, Calendar, Gavel } from 'lucide-react';
 
@@ -20,8 +20,9 @@ const MyAuctionsPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['my-auctions'] });
       alert('Auction deleted successfully');
     },
-    onError: (err: any) => {
-      alert(err.response?.data?.message || 'Failed to delete auction');
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to delete auction');
     }
   });
 

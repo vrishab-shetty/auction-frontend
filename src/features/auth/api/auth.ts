@@ -9,10 +9,10 @@ export interface LoginResponse {
 }
 
 export const login = async (username: string, password: string): Promise<LoginResponse> => {
-  const token = btoa(`${username}:${password}`);
   const response = await apiClient.post<Result<LoginResponse>>('/users/login', {}, {
-    headers: {
-      Authorization: `Basic ${token}`,
+    auth: {
+      username,
+      password,
     },
   });
   return response.data.data as LoginResponse;

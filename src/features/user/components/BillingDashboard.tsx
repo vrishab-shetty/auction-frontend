@@ -20,8 +20,9 @@ export const BillingDashboard: React.FC<BillingDashboardProps> = ({ onAddClick }
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['billingDetails'] });
     },
-    onError: (err: any) => {
-      alert(err.response?.data?.message || 'Failed to delete payment method');
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to delete payment method');
     }
   });
 

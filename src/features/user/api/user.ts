@@ -14,11 +14,11 @@ export const updateUser = async (userData: UserUpdateDTO): Promise<UserDTO> => {
 };
 
 export const changePassword = async (passwordData: ChangePasswordDTO): Promise<void> => {
-  await apiClient.put('/user/self/password', passwordData);
+  await apiClient.put<Result<void>>('/user/self/password', passwordData);
 };
 
 export const deleteUser = async (): Promise<void> => {
-  await apiClient.delete('/user/self');
+  await apiClient.delete<Result<void>>('/user/self');
 };
 
 export const getMyAuctions = async (): Promise<AuctionDTO[]> => {

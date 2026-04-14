@@ -4,6 +4,7 @@ import { AuctionUpdateEvent, NotificationEvent } from '@/features/auctions/types
 export const useAuctionStream = (auctionId?: string, enabled: boolean = true) => {
   const [lastEvent, setLastEvent] = useState<AuctionUpdateEvent | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<Event | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptRef = useRef(0);
 
@@ -19,12 +20,11 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
       const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
       const sseUrl = `${baseUrl}/auctions/${auctionId}/stream`;
       
-      console.log(`Attempting to connect to auction stream: ${auctionId} (Attempt ${reconnectAttemptRef.current + 1})`);
       eventSource = new EventSource(sseUrl, { withCredentials: true });
 
       eventSource.onopen = () => {
-        console.log(`Connected to auction stream: ${auctionId}`);
         setIsConnected(true);
+        setError(null);
         reconnectAttemptRef.current = 0; // Reset attempts on success
       };
 
@@ -38,7 +38,7 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
       });
 
       eventSource.onerror = (err) => {
-        console.error('SSE connection error:', err);
+        setError(err);
         setIsConnected(false);
         
         if (eventSource) {
@@ -47,7 +47,6 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
 
         // Exponential backoff: 1s, 2s, 4s, 8s, 16s, max 30s
         const delay = Math.min(1000 * Math.pow(2, reconnectAttemptRef.current), 30000);
-        console.log(`Reconnecting in ${delay}ms...`);
         
         reconnectTimeoutRef.current = window.setTimeout(() => {
           reconnectAttemptRef.current += 1;
@@ -68,5 +67,5 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
     };
   }, [auctionId, enabled]);
 
-  return { lastEvent, isConnected };
+  return { lastEvent, isConnected, error };
 };
