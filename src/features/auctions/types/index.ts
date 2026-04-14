@@ -47,9 +47,8 @@ export interface AuctionCreationDTO {
 export interface AuctionUpdateEvent {
   auctionId: string;
   itemId: string;
-  currentBid: number;
-  bidCount: number;
-  highestBidder: string;
+  currentPrice: number;
+  buyerName: string;
 }
 
 export interface NotificationEvent<T> {
