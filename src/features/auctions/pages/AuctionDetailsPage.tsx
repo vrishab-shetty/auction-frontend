@@ -5,7 +5,8 @@ import { useAuctionStream } from '../hooks/useAuctionStream';
 import { AuctionStatusBadge } from '../components/AuctionStatusBadge';
 import { ItemCard } from '@/components/ItemCard';
 import { Navbar } from '@/components/Navbar';
-import { Calendar, Clock, User, Package, Signal, SignalLow } from 'lucide-react';
+import { UserBadge } from '@/components/UserBadge';
+import { Calendar, Clock, Package, Signal, SignalLow } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateUtils';
 
 const AuctionDetailsPage: React.FC = () => {
@@ -44,7 +45,7 @@ const AuctionDetailsPage: React.FC = () => {
       setItems(prevItems => 
         prevItems.map(item => 
           item.id === lastEvent.itemId 
-            ? { ...item, currentBid: lastEvent.currentPrice, buyer: lastEvent.buyerName } 
+            ? { ...item, currentBid: lastEvent.currentPrice, buyer: lastEvent.buyer } 
             : item
         )
       );
@@ -140,10 +141,9 @@ const AuctionDetailsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-brand-primary font-bold bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
-                  <User size={18} className="text-brand-secondary" />
                   <div className="flex flex-col">
                     <span className="text-[10px] text-gray-400 uppercase tracking-widest leading-none mb-1">Organizer</span>
-                    <span className="text-sm">{auction.user}</span>
+                    <UserBadge user={auction.seller} />
                   </div>
                 </div>
               </div>
@@ -180,7 +180,7 @@ const AuctionDetailsPage: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {items.map((item) => (
-                <ItemCard key={item.id} item={item} />
+                <ItemCard key={item.id} item={item} auctionId={auctionId} />
               ))}
             </div>
           )}

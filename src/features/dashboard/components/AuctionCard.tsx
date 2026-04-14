@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AuctionDTO } from '@/features/auctions/types';
-import { Clock, Tag, User, Calendar } from 'lucide-react';
+import { Clock, Tag, Calendar } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateUtils';
+import { UserBadge } from '@/components/UserBadge';
 
 interface AuctionCardProps {
   auction: AuctionDTO;
@@ -71,8 +72,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
             </span>
           </div>
           <div className="flex items-center gap-1">
-            <User size={16} />
-            <span className="truncate">{auction.user}</span>
+            <UserBadge user={auction.seller} className="scale-90 origin-left" />
           </div>
         </div>
 

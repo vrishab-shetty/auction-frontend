@@ -1,14 +1,16 @@
 import React from 'react';
 import { ItemDTO } from '@/api/types';
 import { MapPin, TrendingUp, DollarSign } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ItemCardProps {
   item: ItemDTO;
+  auctionId?: string;
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-all duration-300">
+export const ItemCard: React.FC<ItemCardProps> = ({ item, auctionId }) => {
+  const CardContent = (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-all duration-300 h-full">
       <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
         {item.imageUrls?.[0] ? (
           <img 
@@ -53,4 +55,14 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
       </div>
     </div>
   );
+
+  if (auctionId) {
+    return (
+      <Link to={`/auctions/${auctionId}/items/${item.id}`} className="block h-full">
+        {CardContent}
+      </Link>
+    );
+  }
+
+  return CardContent;
 };
