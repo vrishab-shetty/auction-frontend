@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUser } from '../api/user';
 import { UserDTO, UserUpdateDTO } from '../types';
 import { extractFieldErrors } from '@/utils/errorUtils';
-import { useAuthStore } from '@/store/authStore';
 import { User, Mail, Phone, MapPin, FileText } from 'lucide-react';
 
 interface ProfileEditorProps {
@@ -13,7 +12,6 @@ interface ProfileEditorProps {
 
 export const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onSuccess }) => {
   const queryClient = useQueryClient();
-  const { user: currentUser, updateUser: updateGlobalUser } = useAuthStore();
   const formRef = useRef<HTMLFormElement>(null);
   
   const [formData, setFormData] = useState<UserUpdateDTO>({
@@ -40,18 +38,9 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ user, onSuccess })
 
   const mutation = useMutation({
     mutationFn: (data: UserUpdateDTO) => updateUser(data),
-    onSuccess: (updatedUser) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       
-      // Update global auth state to reflect changes (e.g., name) across the app
-      if (currentUser) {
-        updateGlobalUser({
-          ...currentUser,
-          name: updatedUser.name,
-          username: updatedUser.username,
-        });
-      }
-
       alert('Profile updated successfully');
       if (onSuccess) onSuccess();
     },
