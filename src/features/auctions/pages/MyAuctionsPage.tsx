@@ -99,7 +99,12 @@ const MyAuctionsPage: React.FC = () => {
                 <div key={auction.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 hover:border-brand-secondary/30 transition-colors group">
                   <div className="flex-1 space-y-3 w-full">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h3 className="text-xl font-bold text-brand-primary">{auction.name}</h3>
+                      <Link 
+                        to={`/auctions/${auction.id}`}
+                        className="text-xl font-bold text-brand-primary hover:text-brand-secondary transition-colors"
+                      >
+                        {auction.name}
+                      </Link>
                       <AuctionStatusBadge startTime={auction.startTime} endTime={auction.endTime} />
                     </div>
                     
