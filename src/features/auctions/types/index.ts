@@ -1,4 +1,4 @@
-import { ItemDTO } from "@/api/types";
+import { ItemDTO, UserSummary } from "@/api/types";
 
 export interface AuctionDTO {
   id: string;
@@ -6,7 +6,7 @@ export interface AuctionDTO {
   startTime: string;
   endTime: string;
   items: ItemDTO[];
-  user: string;
+  seller: UserSummary;
 }
 
 export interface AuctionItemUpdateDTO {
@@ -48,7 +48,7 @@ export interface AuctionUpdateEvent {
   auctionId: string;
   itemId: string;
   currentPrice: number;
-  buyerName: string;
+  buyer: UserSummary;
 }
 
 export interface NotificationEvent<T> {

@@ -13,6 +13,12 @@ export interface PageResponse<T> {
   isLast: boolean;
 }
 
+export interface UserSummary {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface ItemDTO {
   id: string;
   name: string;
@@ -23,7 +29,7 @@ export interface ItemDTO {
   imageUrls?: string[];
   legitimacyProof?: string;
   extras?: string;
-  buyer?: string;
-  seller?: string;
+  buyer?: UserSummary | null;
+  seller: UserSummary;
   popularity?: number;
 }
