@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
+import { useQuery } from '@tanstack/react-query';
+import { getUser } from '@/features/user/api/user';
 import { LogOut, User as UserIcon, LayoutDashboard, Search as SearchIcon, Settings, Gavel } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -8,7 +10,15 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { data: userData } = useQuery({
+    queryKey: ['user', user?.username],
+    queryFn: () => getUser(user!.username),
+    enabled: !!user?.username,
+  });
+
   if (!user) return null;
+
+  const displayName = userData?.name || user.name;
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -55,7 +65,7 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex flex-col items-end mr-2">
             <span className="text-xs font-black text-white/50 uppercase tracking-widest">Active User</span>
-            <span className="text-sm font-bold">{user.name}</span>
+            <span className="text-sm font-bold">{displayName}</span>
           </div>
           <Link to="/profile" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/10">
             <UserIcon size={20} />

@@ -1,15 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuctionDetails } from '../hooks/useAuctionDetails';
+import { useAuctionStream } from '../hooks/useAuctionStream';
 import { AuctionStatusBadge } from '../components/AuctionStatusBadge';
 import { ItemCard } from '@/components/ItemCard';
 import { Navbar } from '@/components/Navbar';
-import { ChevronRight, Home, Calendar, Clock, User, Package } from 'lucide-react';
+import { Calendar, Clock, User, Package, Signal, SignalLow } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateUtils';
 
 const AuctionDetailsPage: React.FC = () => {
   const { auctionId } = useParams<{ auctionId: string }>();
   const { data: auction, isLoading, isError } = useAuctionDetails(auctionId!);
+  
+  // Determine if auction is live to enable SSE
+  const [isLive, setIsLive] = useState(false);
+
+  useEffect(() => {
+    if (!auction) return;
+    
+    const updateStatus = () => {
+      const now = new Date().getTime();
+      const start = new Date(auction.startTime).getTime();
+      const end = new Date(auction.endTime).getTime();
+      setIsLive(now >= start && now <= end);
+    };
+
+    updateStatus();
+    const interval = setInterval(updateStatus, 1000);
+    return () => clearInterval(interval);
+  }, [auction]);
+
+  const { lastEvent, isConnected } = useAuctionStream(auctionId, isLive);
+  const [items, setItems] = useState(auction?.items || []);
+
+  useEffect(() => {
+    if (auction?.items) {
+      setItems(auction.items);
+    }
+  }, [auction?.items]);
+
+  useEffect(() => {
+    if (lastEvent) {
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === lastEvent.itemId 
+            ? { ...item, currentBid: lastEvent.currentPrice, buyer: lastEvent.buyerName } 
+            : item
+        )
+      );
+    }
+  }, [lastEvent]);
 
   if (isLoading) {
     return (
@@ -63,7 +103,20 @@ const AuctionDetailsPage: React.FC = () => {
                 <h1 className="text-4xl font-black text-brand-primary tracking-tight">
                   {auction.name}
                 </h1>
-                <AuctionStatusBadge startTime={auction.startTime} endTime={auction.endTime} />
+                <div className="flex items-center gap-2">
+                  <AuctionStatusBadge startTime={auction.startTime} endTime={auction.endTime} />
+                  {isLive && (
+                    <div 
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${
+                        isConnected ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-red-50 text-red-600 border-red-100'
+                      }`}
+                      title={isConnected ? 'Live updates active' : 'Live updates disconnected'}
+                    >
+                      {isConnected ? <Signal size={14} /> : <SignalLow size={14} />}
+                      {isConnected ? 'Connected' : 'Disconnected'}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <p className="text-brand-neutral text-lg leading-relaxed max-w-3xl">
@@ -126,7 +179,7 @@ const AuctionDetailsPage: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {auction.items.map((item) => (
+              {items.map((item) => (
                 <ItemCard key={item.id} item={item} />
               ))}
             </div>
