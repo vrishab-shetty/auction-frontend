@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import dashboardService from '../api/dashboardService';
 import { ItemCard } from '@/components/ItemCard';
-import { ChevronLeft, ChevronRight, TrendingUp, Loader2 } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 export const PopularItemsGallery: React.FC = () => {
   const queryClient = useQueryClient();
@@ -16,7 +17,6 @@ export const PopularItemsGallery: React.FC = () => {
     placeholderData: (previousData) => previousData,
   });
 
-  // Strategy 2: Interaction-Based Prefetching
   const prefetchPage = (targetPage: number) => {
     if (targetPage >= 0 && data && targetPage < data.totalPages) {
       queryClient.prefetchQuery({
@@ -45,38 +45,21 @@ export const PopularItemsGallery: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 relative">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="text-brand-secondary" size={20} />
-          <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Trending Now</h3>
-          {isFetching && <Loader2 size={14} className="animate-spin text-brand-secondary ml-2" />}
-        </div>
-        
-        {data && data.totalPages > 1 && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              onMouseEnter={() => prefetchPage(page - 1)}
-              disabled={page === 0 || isFetching}
-              className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-colors"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <span className="text-xs font-bold text-brand-primary uppercase px-2">
-              {page + 1} / {data.totalPages}
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(data.totalPages - 1, p + 1))}
-              onMouseEnter={() => prefetchPage(page + 1)}
-              disabled={page >= data.totalPages - 1 || isFetching}
-              className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-colors"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        )}
-      </div>
+    <div>
+      <SectionHeader 
+        title="Trending Now"
+        subtitle="Discover items with the highest bidding activity and engagement."
+        icon={TrendingUp}
+        iconColorClass="text-brand-primary"
+        iconBgColorClass="bg-brand-secondary"
+        isFetching={isFetching}
+        pagination={{
+          currentPage: page,
+          totalPages: data?.totalPages || 0,
+          onPageChange: setPage,
+          onPrefetch: prefetchPage
+        }}
+      />
 
       <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-40' : 'opacity-100'}`}>
         {data?.content.map((item) => (
