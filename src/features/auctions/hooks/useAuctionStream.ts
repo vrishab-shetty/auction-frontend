@@ -19,11 +19,9 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
       const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
       const sseUrl = `${baseUrl}/auctions/${auctionId}/stream`;
       
-      console.log(`Attempting to connect to auction stream: ${auctionId} (Attempt ${reconnectAttemptRef.current + 1})`);
       eventSource = new EventSource(sseUrl, { withCredentials: true });
 
       eventSource.onopen = () => {
-        console.log(`Connected to auction stream: ${auctionId}`);
         setIsConnected(true);
         reconnectAttemptRef.current = 0; // Reset attempts on success
       };

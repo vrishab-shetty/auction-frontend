@@ -85,9 +85,12 @@ const MyAuctionsPage: React.FC = () => {
               <h3 className="text-2xl font-bold text-brand-primary">No auctions yet</h3>
               <p className="text-brand-neutral max-w-sm mx-auto">You haven't created any auctions. Start by creating your first event to sell items.</p>
             </div>
-            <button className="bg-brand-secondary text-brand-primary px-8 py-3 rounded-xl font-black shadow-lg shadow-brand-secondary/20 hover:scale-105 transition-all">
+            <Link 
+              to="/my-auctions/create"
+              className="bg-brand-secondary text-brand-primary px-8 py-3 rounded-xl font-black shadow-lg shadow-brand-secondary/20 hover:scale-105 transition-all inline-block"
+            >
               Create Your First Auction
-            </button>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">

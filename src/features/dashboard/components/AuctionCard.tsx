@@ -80,18 +80,29 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
           <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Featured Items</p>
           <div className="space-y-3">
             {auction.items.slice(0, 3).map((item) => (
-              <div key={item.id} className="flex justify-between items-center bg-gray-50 p-3 rounded-xl transition-all hover:bg-gray-100 group">
+              <Link 
+                to={`/auctions/${auction.id}/items/${item.id}`} 
+                key={item.id} 
+                className="flex justify-between items-center bg-gray-50 p-3 rounded-xl transition-all hover:bg-gray-100 group"
+              >
                 <div className="flex items-center gap-3">
                   <Tag size={14} className="text-brand-secondary" />
                   <span className="text-sm font-medium text-brand-primary line-clamp-1">{item.name}</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Current Bid</p>
-                  <p className="text-sm font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">
-                    ${item.currentBid || item.initialPrice}
+                  <p className="text-[10px] font-bold text-gray-400 uppercase">
+                    {status === 'Finished' ? 'Final Bid' : 'Current Bid'}
+                  </p>
+                  <p className={`text-sm font-bold transition-colors ${status === 'Finished' ? 'text-gray-500' : 'text-brand-primary group-hover:text-brand-secondary'}`}>
+                    {item.currentBid 
+                      ? `$${item.currentBid}` 
+                      : status === 'Finished' 
+                        ? 'No bids yet' 
+                        : `$${item.startingBid}`
+                    }
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
             {auction.items.length > 3 && (
               <p className="text-xs text-center text-brand-neutral font-medium italic pt-1">

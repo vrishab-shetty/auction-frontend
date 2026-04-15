@@ -1,14 +1,21 @@
 import React from 'react';
 import { ItemDTO } from '@/api/types';
+import { AuctionItemDTO } from '@/features/auctions/types';
 import { MapPin, TrendingUp, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface ItemCardProps {
-  item: ItemDTO;
+  item: ItemDTO | AuctionItemDTO;
   auctionId?: string;
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item, auctionId }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ item, auctionId: manualAuctionId }) => {
+  // item.auctionId exists on ItemDTO, but not on AuctionItemDTO (where it's implied by the context)
+  const effectiveAuctionId = manualAuctionId || (item as ItemDTO).auctionId;
+  
+  // Starting price can be initialPrice (ItemDTO) or startingBid (AuctionItemDTO)
+  const startingPrice = (item as ItemDTO).initialPrice ?? (item as AuctionItemDTO).startingBid;
+
   const CardContent = (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-all duration-300 h-full">
       <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
@@ -41,14 +48,20 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, auctionId }) => {
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Starting At</p>
             <div className="flex items-center text-brand-primary font-bold">
               <DollarSign size={14} />
-              <span>{item.initialPrice}</span>
+              <span>{startingPrice}</span>
             </div>
           </div>
           <div className="text-right">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Current Bid</p>
             <div className="flex items-center justify-end text-brand-secondary font-black text-lg">
-              <DollarSign size={16} />
-              <span>{item.currentBid || item.initialPrice}</span>
+              {item.currentBid ? (
+                <>
+                  <DollarSign size={16} />
+                  <span>{item.currentBid}</span>
+                </>
+              ) : (
+                <span className="text-sm text-gray-400 font-bold">No bids yet</span>
+              )}
             </div>
           </div>
         </div>
@@ -56,13 +69,17 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, auctionId }) => {
     </div>
   );
 
-  if (auctionId) {
+  if (effectiveAuctionId) {
     return (
-      <Link to={`/auctions/${auctionId}/items/${item.id}`} className="block h-full">
+      <Link to={`/auctions/${effectiveAuctionId}/items/${item.id}`} className="block h-full">
         {CardContent}
       </Link>
     );
   }
 
-  return CardContent;
+  return (
+    <Link to={`/items/${item.id}`} className="block h-full">
+      {CardContent}
+    </Link>
+  );
 };

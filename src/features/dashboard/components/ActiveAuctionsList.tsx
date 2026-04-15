@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import dashboardService from '../api/dashboardService';
 import { AuctionCard } from './AuctionCard';
-import { ChevronLeft, ChevronRight, Inbox, Loader2 } from 'lucide-react';
+import { Activity, Inbox } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 export const ActiveAuctionsList: React.FC = () => {
   const queryClient = useQueryClient();
@@ -12,16 +13,14 @@ export const ActiveAuctionsList: React.FC = () => {
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['activeAuctions', page],
     queryFn: () => dashboardService.getActiveAuctions(page, size),
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    staleTime: 1000 * 60,
     placeholderData: (previousData) => previousData,
   });
 
-  // Restore scroll position after content load (following the user provided example)
   useEffect(() => {
     if (data && !isLoading && !isFetching) {
       const savedScrollPos = sessionStorage.getItem('dashboard-scroll');
       if (savedScrollPos) {
-        // Use a small timeout to ensure the DOM has fully adjusted to the new data
         const timeoutId = setTimeout(() => {
           window.scrollTo(0, parseInt(savedScrollPos, 10));
           sessionStorage.removeItem('dashboard-scroll');
@@ -31,7 +30,6 @@ export const ActiveAuctionsList: React.FC = () => {
     }
   }, [data, isLoading, isFetching]);
 
-  // Strategy 1: Reactive Background Prefetching
   useEffect(() => {
     if (data && page < data.totalPages - 1) {
       const nextPage = page + 1;
@@ -67,42 +65,26 @@ export const ActiveAuctionsList: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 relative">
-      {/* Subtle fetching indicator */}
-      {isFetching && (
-        <div className="absolute -top-10 right-0 flex items-center gap-2 text-brand-secondary font-bold text-xs animate-pulse">
-          <Loader2 size={14} className="animate-spin" />
-          Updating Feed...
-        </div>
-      )}
+    <div>
+      <SectionHeader 
+        title="Live Auctions"
+        subtitle="Bidding is active. Join now to secure your exclusive items."
+        icon={Activity}
+        iconColorClass="text-brand-white"
+        iconBgColorClass="bg-brand-primary"
+        isFetching={isFetching}
+        pagination={{
+          currentPage: page,
+          totalPages: data?.totalPages || 0,
+          onPageChange: setPage
+        }}
+      />
 
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-40' : 'opacity-100'}`}>
         {data?.content.map((auction) => (
           <AuctionCard key={auction.id} auction={auction} />
         ))}
       </div>
-
-      {data && data.totalPages > 1 && (
-        <div className="flex justify-center items-center gap-4 pt-4">
-          <button
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0 || isFetching}
-            className="p-3 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <span className="text-sm font-bold text-brand-primary uppercase tracking-widest">
-            Page {page + 1} of {data.totalPages}
-          </span>
-          <button
-            onClick={() => setPage((p) => Math.min(data.totalPages - 1, p + 1))}
-            disabled={page >= data.totalPages - 1 || isFetching}
-            className="p-3 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
-      )}
     </div>
   );
 };

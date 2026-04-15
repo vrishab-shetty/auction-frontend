@@ -1,11 +1,22 @@
 import { ItemDTO, UserSummary } from "@/api/types";
 
+export interface AuctionItemDTO {
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  startingBid: number;
+  currentBid?: number;
+  imageUrls?: string[];
+  buyer?: UserSummary | null;
+}
+
 export interface AuctionDTO {
   id: string;
   name: string;
   startTime: string;
   endTime: string;
-  items: ItemDTO[];
+  items: AuctionItemDTO[];
   seller: UserSummary;
 }
 
