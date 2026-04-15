@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useItemDetails } from '@/features/auctions/hooks/useItemDetails';
 import { usePlaceBid } from '@/features/auctions/hooks/usePlaceBid';
 import { useAuctionStream } from '@/features/auctions/hooks/useAuctionStream';
@@ -13,10 +13,7 @@ import {
   MapPin, 
   DollarSign, 
   Trophy, 
-  User, 
   AlertCircle, 
-  ChevronRight, 
-  Home,
   Gavel,
   History,
   TrendingUp,
@@ -30,18 +27,20 @@ import { AxiosError } from 'axios';
 import { Result, UserSummary } from '@/api/types';
 
 const ItemDetailsPage: React.FC = () => {
-  const { auctionId, itemId } = useParams<{ auctionId: string; itemId: string }>();
+  const { auctionId: urlAuctionId, itemId } = useParams<{ auctionId: string; itemId: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
   
   const { data: item, isLoading: itemLoading, isError: itemError } = useItemDetails(itemId!);
-  const { data: auction } = useAuctionDetails(auctionId!);
   
-  // Determine if auction is live to enable SSE
+  const effectiveAuctionId = urlAuctionId || item?.auctionId;
+
+  const { data: auction } = useAuctionDetails(effectiveAuctionId || 'NONE');
+  
   const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
-    if (!auction) return;
+    if (!auction || effectiveAuctionId === 'NONE') return;
     
     const updateStatus = () => {
       const now = new Date().getTime();
@@ -53,9 +52,9 @@ const ItemDetailsPage: React.FC = () => {
     updateStatus();
     const interval = setInterval(updateStatus, 1000);
     return () => clearInterval(interval);
-  }, [auction]);
+  }, [auction, effectiveAuctionId]);
 
-  const { lastEvent, isConnected } = useAuctionStream(auctionId, isLive);
+  const { lastEvent, isConnected } = useAuctionStream(effectiveAuctionId, isLive);
   const placeBidMutation = usePlaceBid();
 
   const [bidAmount, setBidAmount] = useState<string>('');
@@ -66,17 +65,17 @@ const ItemDetailsPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Sync initial data
   useEffect(() => {
     if (item) {
-      const currentPrice = item.currentBid || item.initialPrice;
-      setLocalCurrentBid(currentPrice);
+      const basePrice = item.currentBid || item.initialPrice;
+      setLocalCurrentBid(basePrice);
       setLocalCurrentBuyer(item.buyer || null);
-      setBidAmount((currentPrice + 1).toString());
+      
+      const suggestedBid = item.currentBid ? basePrice + 1 : basePrice;
+      setBidAmount(suggestedBid.toString());
     }
   }, [item]);
 
-  // Handle Real-time BID_UPDATE
   useEffect(() => {
     if (lastEvent && lastEvent.itemId === itemId) {
       if (lastEvent.currentPrice > localCurrentBid) {
@@ -92,7 +91,6 @@ const ItemDetailsPage: React.FC = () => {
     }
   }, [lastEvent, itemId, localCurrentBid, bidAmount]);
 
-  // Robust ownership check
   const isOwner = Boolean(
     currentUser?.username && 
     item?.seller?.email && 
@@ -101,7 +99,7 @@ const ItemDetailsPage: React.FC = () => {
 
   const handleBidSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isOwner) return;
+    if (isOwner || !effectiveAuctionId) return;
 
     setConflictError(null);
     setSuccessMessage(null);
@@ -120,7 +118,7 @@ const ItemDetailsPage: React.FC = () => {
     await new Promise(resolve => setTimeout(resolve, 800));
 
     placeBidMutation.mutate(
-      { auctionId: auctionId!, itemId: itemId!, bidAmount: amount },
+      { auctionId: effectiveAuctionId!, itemId: itemId!, bidAmount: amount },
       {
         onSuccess: () => {
           setSuccessMessage(`Success! You are now the leading bidder at $${amount.toLocaleString()}.`);
@@ -184,13 +182,43 @@ const ItemDetailsPage: React.FC = () => {
     );
   }
 
-  const isClosed = new Date(auction?.endTime || item.initialPrice).getTime() < new Date().getTime();
+  const isClosed = auction ? new Date(auction.endTime).getTime() < new Date().getTime() : false;
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar />
 
       <main className="max-w-7xl mx-auto p-4 md:p-8 pt-10 space-y-8">
+        <div className="flex items-center justify-between">
+          <button 
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-brand-neutral hover:text-brand-primary font-bold transition-colors group"
+          >
+            <div className="p-2 rounded-xl group-hover:bg-gray-100 transition-colors">
+              <ArrowLeft size={20} />
+            </div>
+            <span>Back to results</span>
+          </button>
+
+          {!effectiveAuctionId && (
+            <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-xl text-sm font-bold border border-amber-100 flex items-center gap-2">
+              <Info size={16} />
+              Resolving Auction Context...
+            </div>
+          )}
+        </div>
+
+        {/* Item Title Header */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-brand-secondary font-black text-xs uppercase tracking-[0.2em]">
+            <Gavel size={14} />
+            <span>{auction?.name || 'Auction Item'}</span>
+          </div>
+          <h1 className="text-5xl font-black text-brand-primary tracking-tight">
+            {item.name}
+          </h1>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Column: Media & Description */}
           <div className="space-y-8">
@@ -223,6 +251,13 @@ const ItemDetailsPage: React.FC = () => {
                 
                 <div className="grid grid-cols-2 gap-6 pt-4">
                   <div className="space-y-1">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Starting Price</p>
+                    <div className="flex items-center gap-2 text-brand-primary font-bold">
+                      <DollarSign size={16} className="text-brand-secondary" />
+                      <span>${item.initialPrice.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Location</p>
                     <div className="flex items-center gap-2 text-brand-primary font-bold">
                       <MapPin size={16} className="text-brand-secondary" />
@@ -250,9 +285,13 @@ const ItemDetailsPage: React.FC = () => {
               <div className="relative z-10 space-y-8">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <p className="text-xs font-black uppercase tracking-[0.2em] opacity-60">Current Highest Bid</p>
+                    <p className="text-xs font-black uppercase tracking-[0.2em] opacity-60">
+                      {item?.currentBid ? 'Current Highest Bid' : 'Starting Price'}
+                    </p>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-black tracking-tighter">${localCurrentBid.toLocaleString()}</span>
+                      <span className="text-5xl font-black tracking-tighter">
+                        ${(item?.currentBid || item?.initialPrice || 0).toLocaleString()}
+                      </span>
                       <span className="text-xl font-bold opacity-60">USD</span>
                     </div>
                   </div>
@@ -278,7 +317,7 @@ const ItemDetailsPage: React.FC = () => {
                         value={bidAmount}
                         onChange={(e) => setBidAmount(e.target.value)}
                         placeholder="0.00"
-                        disabled={isProcessing || isOwner || isClosed}
+                        disabled={isProcessing || isOwner || isClosed || !effectiveAuctionId}
                         required
                       />
                     </div>
@@ -288,6 +327,16 @@ const ItemDetailsPage: React.FC = () => {
                     <div className="bg-blue-500/20 border border-blue-500/50 p-4 rounded-2xl flex items-center gap-3 text-blue-100">
                       <Info size={20} />
                       <p className="text-sm font-bold">You cannot bid on your own auction items.</p>
+                    </div>
+                  )}
+
+                  {!effectiveAuctionId && (
+                    <div className="bg-amber-500/20 border border-amber-500/50 p-4 rounded-2xl flex flex-col gap-2 text-amber-100">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle size={20} />
+                        <p className="text-sm font-bold">Auction Context Missing</p>
+                      </div>
+                      <p className="text-xs opacity-80">Loading auction details...</p>
                     </div>
                   )}
 
@@ -307,7 +356,7 @@ const ItemDetailsPage: React.FC = () => {
 
                   <button
                     type="submit"
-                    disabled={isProcessing || placeBidMutation.isPending || isOwner || isClosed}
+                    disabled={isProcessing || placeBidMutation.isPending || isOwner || isClosed || !effectiveAuctionId}
                     className="w-full bg-brand-secondary text-brand-primary p-5 rounded-3xl font-black text-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-3"
                   >
                     {isProcessing || placeBidMutation.isPending ? (
