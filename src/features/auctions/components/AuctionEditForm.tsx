@@ -31,10 +31,10 @@ export const AuctionEditForm: React.FC<AuctionEditFormProps> = ({ auction, onClo
       name: item.name,
       description: item.description,
       location: item.location,
-      initialPrice: item.initialPrice,
-      imageUrls: item.imageUrls,
-      legitimacyProof: item.legitimacyProof,
-      extras: item.extras
+      initialPrice: item.startingBid,
+      imageUrls: item.imageUrls || [],
+      legitimacyProof: '', // Not provided in AuctionItemDTO
+      extras: '' // Not provided in AuctionItemDTO
     }))
   });
 
