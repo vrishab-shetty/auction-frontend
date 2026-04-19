@@ -2,7 +2,7 @@ import React from 'react';
 import { DashboardLayout } from '@/features/dashboard/components/DashboardLayout';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from '@/features/core/components/Navbar';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuthStore();

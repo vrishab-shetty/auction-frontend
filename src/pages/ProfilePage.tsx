@@ -8,13 +8,11 @@ import { BillingDashboard } from '@/features/user/components/BillingDashboard';
 import { PaymentMethodEditor } from '@/features/user/components/PaymentMethodEditor';
 import { AccountSettings } from '@/features/user/components/AccountSettings';
 import { ChangePasswordForm } from '@/features/user/components/ChangePasswordForm';
-import { useNavigate } from 'react-router-dom';
 import { User, CreditCard, Settings, ArrowLeft, ShieldCheck } from 'lucide-react';
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from '@/features/core/components/Navbar';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuthStore();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'settings'>('profile');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isAddingPayment, setIsAddingPayment] = useState(false);

@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import auctionService from '../api/auctionService';
-import { AxiosError } from 'axios';
-import { Result } from '@/api/types';
+import { ItemDTO } from '@/api/types';
 
 interface PlaceBidParams {
   auctionId: string;
@@ -16,7 +15,7 @@ export const usePlaceBid = () => {
     mutationFn: ({ auctionId, itemId, bidAmount }: PlaceBidParams) => 
       auctionService.placeBid(auctionId, itemId, bidAmount),
     onSuccess: (updatedItem) => {
-      queryClient.setQueryData(['item', updatedItem.id], (oldItem: any) => ({
+      queryClient.setQueryData(['item', updatedItem.id], (oldItem: ItemDTO | undefined) => ({
         ...oldItem,
         ...updatedItem
       }));

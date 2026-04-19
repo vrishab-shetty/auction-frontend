@@ -6,7 +6,7 @@ interface PaymentMethodCardProps {
   method: CreditCard | BankAccount;
   isDefault?: boolean;
   onRemove?: (id: string) => void;
-  onEdit?: (method: any) => void;
+  onEdit?: (method: CreditCard | BankAccount) => void;
 }
 
 export const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({ 

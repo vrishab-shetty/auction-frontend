@@ -4,6 +4,7 @@ import { AuctionUpdateEvent, NotificationEvent } from '@/features/auctions/types
 export const useAuctionStream = (auctionId?: string, enabled: boolean = true) => {
   const [lastEvent, setLastEvent] = useState<AuctionUpdateEvent | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const reconnectAttemptRef = useRef(0);
 
@@ -16,6 +17,7 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
     let eventSource: EventSource | null = null;
 
     const connect = () => {
+      setError(null);
       const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
       const sseUrl = `${baseUrl}/auctions/${auctionId}/stream`;
       
@@ -31,12 +33,12 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
           const notification: NotificationEvent<AuctionUpdateEvent> = JSON.parse(event.data);
           setLastEvent(notification.data);
         } catch (err) {
-          console.error('Failed to parse BID_UPDATE event:', err);
+          setError('Failed to parse BID_UPDATE event');
         }
       });
 
-      eventSource.onerror = (err) => {
-        console.error('SSE connection error:', err);
+      eventSource.onerror = () => {
+        setError('SSE connection error');
         setIsConnected(false);
         
         if (eventSource) {
@@ -45,7 +47,6 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
 
         // Exponential backoff: 1s, 2s, 4s, 8s, 16s, max 30s
         const delay = Math.min(1000 * Math.pow(2, reconnectAttemptRef.current), 30000);
-        console.log(`Reconnecting in ${delay}ms...`);
         
         reconnectTimeoutRef.current = window.setTimeout(() => {
           reconnectAttemptRef.current += 1;
@@ -66,5 +67,5 @@ export const useAuctionStream = (auctionId?: string, enabled: boolean = true) =>
     };
   }, [auctionId, enabled]);
 
-  return { lastEvent, isConnected };
+  return { lastEvent, isConnected, error };
 };
