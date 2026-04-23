@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import searchService from '../api/searchService';
 import { useDebounce } from '@/hooks/useDebounce';
-import { ItemDTO } from '@/api/types';
 
 export const useSearch = (pageSize = 12) => {
   const queryClient = useQueryClient();

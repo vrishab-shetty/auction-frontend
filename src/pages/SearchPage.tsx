@@ -4,7 +4,7 @@ import { ItemCard } from '@/components/ItemCard';
 import { Search, MapPin, ChevronLeft, ChevronRight, Inbox, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from '@/features/core/components/Navbar';
 import { ItemDTO } from '@/api/types';
 
 const SearchPage: React.FC = () => {

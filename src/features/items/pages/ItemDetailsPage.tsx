@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useItemDetails } from '@/features/auctions/hooks/useItemDetails';
 import { usePlaceBid } from '@/features/auctions/hooks/usePlaceBid';
 import { useAuctionStream } from '@/features/auctions/hooks/useAuctionStream';
 import { useAuctionDetails } from '@/features/auctions/hooks/useAuctionDetails';
 import { AuctionStatusBadge } from '@/features/auctions/components/AuctionStatusBadge';
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from '@/features/core/components/Navbar';
 import { useAuthStore } from '@/store/authStore';
 import { UserBadge } from '@/components/UserBadge';
 import { 
   ArrowLeft, 
   MapPin, 
   DollarSign, 
-  Trophy, 
   AlertCircle, 
   Gavel,
   History,
@@ -127,7 +126,7 @@ const ItemDetailsPage: React.FC = () => {
         },
         onError: (err: unknown) => {
           setIsProcessing(false);
-          const axiosError = err as AxiosError<Result<any>>;
+          const axiosError = err as AxiosError<Result<number>>;
           const serverResult = axiosError.response?.data;
           const status = axiosError.response?.status;
 

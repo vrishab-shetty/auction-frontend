@@ -1,4 +1,4 @@
-import { ItemDTO, UserSummary } from "@/api/types";
+import { UserSummary } from "@/api/types";
 
 export interface AuctionItemDTO {
   id: string;
