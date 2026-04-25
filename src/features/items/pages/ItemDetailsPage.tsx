@@ -285,11 +285,11 @@ const ItemDetailsPage: React.FC = () => {
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <p className="text-xs font-black uppercase tracking-[0.2em] opacity-60">
-                      {item?.currentBid ? 'Current Highest Bid' : 'Starting Price'}
+                      {localBuyer ? 'Current Highest Bid' : 'Starting Price'}
                     </p>
                     <div className="flex items-baseline gap-1">
                       <span className="text-5xl font-black tracking-tighter">
-                        ${(item?.currentBid || item?.initialPrice || 0).toLocaleString()}
+                        ${localCurrentBid.toLocaleString()}
                       </span>
                       <span className="text-xl font-bold opacity-60">USD</span>
                     </div>
