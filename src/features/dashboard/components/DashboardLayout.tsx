@@ -2,6 +2,7 @@ import React from 'react';
 import { ActiveAuctionsList } from './ActiveAuctionsList';
 import { PopularItemsGallery } from './PopularItemsGallery';
 import { PastAuctionsSection } from './PastAuctionsSection';
+import { UpcomingAuctionsSection } from './UpcomingAuctionsSection';
 
 export const DashboardLayout: React.FC = () => {
   return (
@@ -14,6 +15,11 @@ export const DashboardLayout: React.FC = () => {
       {/* Active Auctions Section */}
       <section>
         <ActiveAuctionsList />
+      </section>
+
+      {/* Upcoming Auctions Section */}
+      <section>
+        <UpcomingAuctionsSection />
       </section>
 
       {/* Past Auctions Section */}

@@ -1,5 +1,7 @@
 import { UserSummary } from "@/api/types";
 
+export type AuctionStatus = 'ACTIVE' | 'SCHEDULED' | 'ENDED';
+
 export interface AuctionItemDTO {
   id: string;
   name: string;
@@ -16,6 +18,7 @@ export interface AuctionDTO {
   name: string;
   startTime: string;
   endTime: string;
+  status: AuctionStatus;
   items: AuctionItemDTO[];
   seller: UserSummary;
 }

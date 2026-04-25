@@ -97,8 +97,7 @@ const MyAuctionsPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {auctions?.map((auction) => {
-              const now = new Date().getTime();
-              const hasStarted = new Date(auction.startTime).getTime() <= now;
+              const hasStarted = auction.status !== 'SCHEDULED';
 
               return (
                 <div key={auction.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 hover:border-brand-secondary/30 transition-colors group">
@@ -110,7 +109,7 @@ const MyAuctionsPage: React.FC = () => {
                       >
                         {auction.name}
                       </Link>
-                      <AuctionStatusBadge startTime={auction.startTime} endTime={auction.endTime} />
+                      <AuctionStatusBadge status={auction.status} />
                     </div>
                     
                     <div className="flex flex-wrap gap-6 text-sm">
