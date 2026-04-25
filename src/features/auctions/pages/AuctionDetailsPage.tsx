@@ -12,24 +12,8 @@ import { formatRelativeTime } from '@/utils/dateUtils';
 const AuctionDetailsPage: React.FC = () => {
   const { auctionId } = useParams<{ auctionId: string }>();
   const { data: auction, isLoading, isError } = useAuctionDetails(auctionId!);
-  
-  // Determine if auction is live to enable SSE
-  const [isLive, setIsLive] = useState(false);
 
-  useEffect(() => {
-    if (!auction) return;
-    
-    const updateStatus = () => {
-      const now = new Date().getTime();
-      const start = new Date(auction.startTime).getTime();
-      const end = new Date(auction.endTime).getTime();
-      setIsLive(now >= start && now <= end);
-    };
-
-    updateStatus();
-    const interval = setInterval(updateStatus, 1000);
-    return () => clearInterval(interval);
-  }, [auction]);
+  const isLive = auction?.status === 'ACTIVE';
 
   const { lastEvent, isConnected } = useAuctionStream(auctionId, isLive);
   const [items, setItems] = useState(auction?.items || []);
@@ -87,7 +71,7 @@ const AuctionDetailsPage: React.FC = () => {
     );
   }
 
-  const isClosed = new Date(auction.endTime).getTime() < new Date().getTime();
+  const isClosed = auction.status === 'ENDED';
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -105,7 +89,7 @@ const AuctionDetailsPage: React.FC = () => {
                   {auction.name}
                 </h1>
                 <div className="flex items-center gap-2">
-                  <AuctionStatusBadge startTime={auction.startTime} endTime={auction.endTime} />
+                  <AuctionStatusBadge status={auction.status} />
                   {isLive && (
                     <div 
                       className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${

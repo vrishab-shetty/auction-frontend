@@ -36,22 +36,7 @@ const ItemDetailsPage: React.FC = () => {
 
   const { data: auction } = useAuctionDetails(effectiveAuctionId || 'NONE');
   
-  const [isLive, setIsLive] = useState(false);
-
-  useEffect(() => {
-    if (!auction || effectiveAuctionId === 'NONE') return;
-    
-    const updateStatus = () => {
-      const now = new Date().getTime();
-      const start = new Date(auction.startTime).getTime();
-      const end = new Date(auction.endTime).getTime();
-      setIsLive(now >= start && now <= end);
-    };
-
-    updateStatus();
-    const interval = setInterval(updateStatus, 1000);
-    return () => clearInterval(interval);
-  }, [auction, effectiveAuctionId]);
+  const isLive = auction?.status === 'ACTIVE';
 
   const { lastEvent, isConnected } = useAuctionStream(effectiveAuctionId, isLive);
   const placeBidMutation = usePlaceBid();
@@ -181,7 +166,7 @@ const ItemDetailsPage: React.FC = () => {
     );
   }
 
-  const isClosed = auction ? new Date(auction.endTime).getTime() < new Date().getTime() : false;
+  const isClosed = auction?.status === 'ENDED';
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -378,7 +363,7 @@ const ItemDetailsPage: React.FC = () => {
             <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 space-y-6">
               <div className="flex items-center gap-3 border-b border-gray-50 pb-4">
                 <div className="flex items-center gap-2">
-                  <AuctionStatusBadge startTime={auction?.startTime || ''} endTime={auction?.endTime || ''} />
+                  <AuctionStatusBadge status={auction?.status ?? 'ENDED'} />
                   {isLive && (
                     <div 
                       className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${
