@@ -58,7 +58,7 @@ export const ActiveAuctionsList: React.FC = () => {
         </div>
         <div>
           <h3 className="text-xl font-bold text-brand-primary">No Active Auctions</h3>
-          <p className="text-brand-neutral max-w-xs mx-auto">There are currently no live auctions. Check back later or explore popular items.</p>
+          <p className="text-brand-neutral max-w-xs mx-auto">There are currently no live auctions. Check back later.</p>
         </div>
       </div>
     );
