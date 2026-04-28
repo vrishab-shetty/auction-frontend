@@ -17,6 +17,7 @@ export interface UserSummary {
   id: string;
   name: string;
   email: string;
+  isDeleted: boolean;
 }
 
 export interface ItemDTO {

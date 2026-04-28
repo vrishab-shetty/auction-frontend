@@ -20,6 +20,17 @@ export const UserBadge: React.FC<UserBadgeProps> = ({ user, fallback = 'Anonymou
     );
   }
 
+  if (user.isDeleted) {
+    return (
+      <div className={`flex items-center gap-2 text-gray-400 ${className}`}>
+        <div className="w-6 h-6 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center grayscale">
+          <UserIcon size={12} />
+        </div>
+        <span className="text-sm font-medium italic truncate max-w-[150px]">{user.name}</span>
+      </div>
+    );
+  }
+
   return (
     <div className={`flex items-center gap-2 text-brand-primary ${className}`} title={user.email}>
       <div className="w-6 h-6 bg-brand-secondary/20 text-brand-secondary rounded-full flex items-center justify-center">

@@ -12,6 +12,7 @@ export interface UserDTO {
   username: string;
   contact: string;
   enabled: boolean;
+  isDeleted: boolean;
   homeAddress: Address;
 }
 
