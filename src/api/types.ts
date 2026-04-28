@@ -31,6 +31,5 @@ export interface ItemDTO {
   extras?: string;
   buyer?: UserSummary | null;
   seller: UserSummary;
-  popularity?: number;
   auctionId?: string;
 }
